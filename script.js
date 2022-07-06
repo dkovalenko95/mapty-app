@@ -23,6 +23,7 @@ if (navigator.geolocation) {
       console.log(`https://www.google.com.ua/maps/@${latitude},${longitude},13z`);
 
       const coords = [latitude, longitude];
+      const staticCoords = [50.3671577, 30.4406045];
 
       // Define 'mapE' as a Global variable
       map = L.map('map').setView(coords, 13);
