@@ -72,6 +72,7 @@ class App {
   // Private fields(private instance properties)
   #map;
   #mapEvent;
+  #mapZoomLevel = 13;
   #workouts = [];
 
   constructor() {
@@ -80,6 +81,8 @@ class App {
     form.addEventListener('submit', this._newWorkout.bind(this));
     // Toggle 'input' type
     inputType.addEventListener('change', this._toggleElevationField);
+    // Event delegation on containerWorkouts
+    containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
   }
 
   _getPosition() {
@@ -100,7 +103,7 @@ class App {
 
     console.log(this);
 
-    this.#map = L.map('map').setView(coords, 13);
+    this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
     console.log(this.#map);
 
     // Google Map tiles
@@ -256,7 +259,7 @@ class App {
           <span class="workout__unit">km/h</span>
         </div>
         <div class="workout__details">
-          <span class="workout__icon">⛰</span>
+          <span class="workout__icon">🗻</span>
           <span class="workout__value">${workout.elevationGain}</span>
           <span class="workout__unit">m</span>
         </div>
@@ -264,6 +267,25 @@ class App {
       `;
 
       form.insertAdjacentHTML('afterend', htmlWorkout);
+  }
+
+  _moveToPopup(e) {
+    const workoutEl = e.target.closest('.workout')
+    console.log(workoutEl);
+    // Use id to find needed workout in arr
+
+    // Guard clause
+    if (!workoutEl) return;
+    const workout = this.#workouts.find(work => work.id === workoutEl.dataset.id);
+    console.log(workout);
+
+    // Build-in Leaflet method
+    this.#map.setView(workout.coords, this.#mapZoomLevel, {
+      animate: true,
+      pan: {
+        duration: 1,
+      },
+    }); 
   }
 }
 
