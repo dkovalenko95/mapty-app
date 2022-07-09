@@ -11,15 +11,12 @@ const inputElevation = document.querySelector('.form__input--elevation');
 
 // WORKOUT CLASSES
 class Workout {
+  /// Public instance fields
   date = new Date();
   id = uuid.v4();
   clicks = 0;
 
   constructor(coords, distance, duration) {
-    // Same as fields above:
-    // this.date = ...
-    // this.id = ...
-
     this.coords = coords; // [lat, lng]
     this.distance = distance; // in km
     this.duration = duration; // im min
@@ -30,10 +27,6 @@ class Workout {
 
     this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${months[this.date.getMonth()]} ${this.date.getDate()}`;
   }
-
-  click() {
-    this.clicks++;
-  }
 }
 
 class Running extends Workout {
@@ -42,9 +35,8 @@ class Running extends Workout {
   constructor(coords, distance, duration, cadence) {
     super(coords, distance, duration);
     this.cadence = cadence;
-    // this.type = 'running' -> same as 'type = 'running'' as a public field above
 
-    this.calcPace(); // returns actual pace
+    this.calcPace(); // returns pace
     this._setDescription();
   }
 
@@ -112,10 +104,10 @@ class App {
     const coords = [latitude, longitude];
     const staticCoords = [50.3671577, 30.4406045];
 
-    console.log(this);
+    // console.log(this);
 
     this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
-    console.log(this.#map);
+    // console.log(this.#map);
 
     // Google Map tiles
     L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
@@ -167,6 +159,7 @@ class App {
     const type = inputType.value;
     const distance = +inputDistance.value;
     const duration = +inputDuration.value;
+
     // Get lat, lng coords
     const { lat, lng } = this.#mapEvent.latlng;
 
@@ -176,11 +169,9 @@ class App {
     // If workout running, create 'running obj'
     if (type === 'running') {
       const cadence = +inputCadence.value;
-      // Check if data is valid -> Guard clause
+
+      // Guard clause
       if (
-        // !Number.isFinite(distance) ||
-        // !Number.isFinite(duration) ||
-        // !Number.isFinite(cadence)
         !validInputs(distance, duration, cadence) ||
         !allPositive(distance, duration, cadence)
       ) 
@@ -193,6 +184,7 @@ class App {
     // If workout cycling, create 'cycling obj'
     if (type === 'cycling') {
       const elevation = +inputElevation.value;
+
       // Check if data is valid
       if (
         !validInputs(distance, duration, elevation) ||
@@ -206,7 +198,6 @@ class App {
 
     // Add new obj to workout arr
     this.#workouts.push(workout);
-    console.log(workout);
 
     // Render workouts on a map as marker -> display marker
     this._renderWorkoutMarker(workout);
@@ -222,7 +213,7 @@ class App {
   }
 
   _renderWorkoutMarker(workout) {
-    console.log(this.#mapEvent);
+    // console.log(this.#mapEvent);
 
     L.marker(workout.coords)
     .addTo(this.#map)
@@ -290,14 +281,13 @@ class App {
 
   _moveToPopup(e) {
     const workoutEl = e.target.closest('.workout')
-    console.log(workoutEl);
-    // Use id to find needed workout in arr
+    // console.log(workoutEl);
 
+    // Use id to find needed workout in arr
     // Guard clause
     if (!workoutEl) return;
-
     const workout = this.#workouts.find(work => work.id === workoutEl.dataset.id);
-    console.log(workout);
+    // console.log(workout);
 
     // Build-in Leaflet method
     this.#map.setView(workout.coords, this.#mapZoomLevel, {
@@ -306,9 +296,6 @@ class App {
         duration: 1,
       },
     });
-    
-    // Using the public interface
-    // workout.click();
   }
 
   _setLocalStorage() {
@@ -317,7 +304,7 @@ class App {
 
   _getlocalStorage() {
     const storageData = JSON.parse(localStorage.getItem('workouts'));
-    console.log(storageData);
+    // console.log(storageData);
     
     // Guard clause
     if (!storageData) return;
@@ -328,6 +315,11 @@ class App {
     this.#workouts.forEach(workout => {
       this._renderWorkout(workout);
     });
+  }
+
+  reset() {
+    localStorage.removeItem('workouts');
+    location.reload();
   }
 }
 
